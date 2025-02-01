@@ -18,7 +18,7 @@ const Announcements = () => {
             laboriosam modi recusandae distinctio quas in.
           </p>
         </div>
-        <div className="bg-LamaPurpleLight rounded-md p-4 mt-4">
+        <div className="bg-LamaPurpleLight rounded-md p-4">
           <div className="flex items-center justify-between">
             <h2 className="font-medium">Lorem ipsum dolor sit</h2>
             <span className="text-xs text-gray-400 bg-white rounded-md px-1 py-1">
@@ -30,7 +30,7 @@ const Announcements = () => {
             laboriosam modi recusandae distinctio quas in.
           </p>
         </div>
-        <div className="bg-LamaYellowLight rounded-md p-4 mt-4">
+        <div className="bg-LamaYellowLight rounded-md p-4">
           <div className="flex items-center justify-between">
             <h2 className="font-medium">Lorem ipsum dolor sit</h2>
             <span className="text-xs text-gray-400 bg-white rounded-md px-1 py-1">
