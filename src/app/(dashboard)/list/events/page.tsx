@@ -2,9 +2,10 @@ import FormModal from "@/app/components/FormModal";
 import Pagination from "@/app/components/Pagination";
 import Table from "@/app/components/Table";
 import TableSearch from "@/app/components/TableSearch";
-import { eventsData, role } from "@/lib/data";
+// import { eventsData, role } from "@/lib/data";
 import prisma from "@/lib/prisma";
 import { ITEM_PER_PAGE } from "@/lib/settings";
+import { currentUserId, role } from "@/lib/utils";
 import { Class, Event, Prisma } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
@@ -35,10 +36,14 @@ const columns = [
     accessor: "endTime",
     className: "hidden md:table-cell",
   },
-  {
-    header: "Actions",
-    accessor: "action",
-  },
+  ...(role === "admin"
+    ? [
+        {
+          header: "Actions",
+          accessor: "action",
+        },
+      ]
+    : []),
 ];
 
 const renderRow = (item: EventList) => (
@@ -47,7 +52,7 @@ const renderRow = (item: EventList) => (
     className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-LamaPurpleLight"
   >
     <td className=" flex items-center gap-4 p-4">{item.title}</td>
-    <td className="">{item.class.name}</td>
+    <td className="">{item.class?.name || "-"}</td>
     <td className=" hidden md:table-cell">
       {new Intl.DateTimeFormat("en-Us").format(item.startTime)}
     </td>
@@ -106,6 +111,36 @@ const EventListPage = async ({
     }
   }
 
+  // ROLE CONDITIONS
+
+  // switch (role) {
+  //   case "admin":
+  //     break;
+  //   case "teacher":
+  //     query.OR = [
+  //       { classId: null },
+  //       { class: { lessons: { some: { teacherId: currentUserId! } } } },
+  //     ];
+
+  //     break;
+
+  //   default:
+  //     break;
+  // }
+
+  const roleConditions = {
+    teacher: { lessons: { some: { teacherId: currentUserId! } } },
+    student: { students: { some: { id: currentUserId! } } },
+    parent: { students: { some: { parentId: currentUserId! } } },
+  };
+
+  query.OR = [
+    { classId: null },
+    {
+      class: roleConditions[role as keyof typeof roleConditions] || {},
+    },
+  ];
+
   const [data, count] = await prisma.$transaction([
     prisma.event.findMany({
       where: query,
@@ -117,7 +152,7 @@ const EventListPage = async ({
     }),
     prisma.event.count({ where: query }),
   ]);
-  
+
   return (
     <div className="bg-white p-4 rounded-md flex-1 m-4 mt-0">
       {/* TOP */}
