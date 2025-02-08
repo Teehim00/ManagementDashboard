@@ -20,10 +20,10 @@ const columns = [
     accessor: "teachers",
     className: " hidden md:table-cell",
   },
-  {
+  ...(role==="admin"?[{
     header: "Actions",
     accessor: "action",
-  },
+  }]:[]),
 ];
 
 const renderRow = (item: SubjectList) => (
