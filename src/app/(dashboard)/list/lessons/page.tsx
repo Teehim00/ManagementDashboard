@@ -1,19 +1,27 @@
-import FormModal from "@/app/components/FormModal";
+import FormContainer from "@/app/components/FormContainer";
 import Pagination from "@/app/components/Pagination";
 import Table from "@/app/components/Table";
 import TableSearch from "@/app/components/TableSearch";
-// import { lessonsData, role } from "@/lib/data";
 import prisma from "@/lib/prisma";
 import { ITEM_PER_PAGE } from "@/lib/settings";
-import { role } from "@/lib/utils";
 import { Class, Lesson, Prisma, Subject, Teacher } from "@prisma/client";
-// import { access } from "fs";
 import Image from "next/image";
-import Link from "next/link";
+import { auth } from "@clerk/nextjs/server";
 
 type LessonList = Lesson & { subject: Subject } & { class: Class } & {
   teacher: Teacher;
 };
+
+
+const LessonListPage = async ({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | undefined };
+}) => {
+
+const { sessionClaims } = auth();
+const role = (sessionClaims?.metadata as { role?: string })?.role;
+
 
 const columns = [
   {
@@ -29,7 +37,6 @@ const columns = [
     accessor: "teacher",
     className: "hidden md:table-cell",
   },
-
   ...(role === "admin"
     ? [
         {
@@ -45,18 +52,17 @@ const renderRow = (item: LessonList) => (
     key={item.id}
     className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-LamaPurpleLight"
   >
-    <td className=" flex items-center gap-4 p-4">{item.subject.name}</td>
+    <td className="flex items-center gap-4 p-4">{item.subject.name}</td>
     <td>{item.class.name}</td>
-    <td className=" hidden md:table-cell">
-      {item.teacher.name + "" + item.teacher.surname}
+    <td className="hidden md:table-cell">
+      {item.teacher.name + " " + item.teacher.surname}
     </td>
-
     <td>
       <div className="flex items-center gap-2">
         {role === "admin" && (
           <>
-            <FormModal table="lesson" type="update" data={item} />
-            <FormModal table="lesson" type="delete" id={item.id} />
+            <FormContainer table="lesson" type="update" data={item} />
+            <FormContainer table="lesson" type="delete" id={item.id} />
           </>
         )}
       </div>
@@ -64,11 +70,6 @@ const renderRow = (item: LessonList) => (
   </tr>
 );
 
-const LessonListPage = async ({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | undefined };
-}) => {
   const { page, ...queryParams } = searchParams;
 
   const p = page ? parseInt(page) : 1;
@@ -79,10 +80,10 @@ const LessonListPage = async ({
 
   if (queryParams) {
     for (const [key, value] of Object.entries(queryParams)) {
-      if (value !== undefined)
+      if (value !== undefined) {
         switch (key) {
           case "classId":
-            query.classId = parseFloat(value);
+            query.classId = parseInt(value);
             break;
           case "teacherId":
             query.teacherId = value;
@@ -96,6 +97,7 @@ const LessonListPage = async ({
           default:
             break;
         }
+      }
     }
   }
 
@@ -121,20 +123,19 @@ const LessonListPage = async ({
         <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
           <TableSearch />
           <div className="flex items-center gap-4 self-end">
-            <button className="w-8 h-8 flex items-center justify-center rounded-full   bg-LamaYellow">
+            <button className="w-8 h-8 flex items-center justify-center rounded-full bg-LamaYellow">
               <Image src="/filter.png" alt="" width={14} height={14} />
             </button>
-            <button className="w-8 h-8 flex items-center justify-center rounded-full   bg-LamaYellow">
+            <button className="w-8 h-8 flex items-center justify-center rounded-full bg-LamaYellow">
               <Image src="/sort.png" alt="" width={14} height={14} />
             </button>
-            {role === "admin" && <FormModal table="lesson" type="create" />}
+            {role === "admin" && <FormContainer table="lesson" type="create" />}
           </div>
         </div>
       </div>
       {/* LIST */}
       <Table columns={columns} renderRow={renderRow} data={data} />
       {/* PAGINATION */}
-
       <Pagination page={p} count={count} />
     </div>
   );
