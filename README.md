@@ -18,11 +18,6 @@ To get this project up and running on your local machine, follow these steps:
 
 Clone the repository to your local machine:
 
-```bash
-git clone <repo-url>
-cd ManagementDashboard
-
-
 ### 2. Install Dependencies
 Install the required dependencies for the project:
 npm install
@@ -43,21 +38,16 @@ Port 3000 for the Next.js application
 Once the containers are set up and running, open the project in your browser:
 http://localhost:3000
 
-Using the System
+### Using the System
 You can now interact with the system by visiting the URL above. To manage the data, you can add and update the following entities:
 Class
 Teacher
 Student
 
-Testing
-At the moment, there are no specific tests included in the project, but testing can be added later as the project evolves. Feel free to contribute by adding testing features.
-
-
-Deployment
+### Deployment
 This project can be deployed to various cloud platforms such as:
-
 AWS EC2: Deploy the application to an EC2 instance.
 Docker: Use Docker to run the application and PostgreSQL database locally or in any cloud environment.
 Oracle Cloud: Deploy the project using Oracle Cloud's Free Tier.
 Follow the respective cloud platform documentation for detailed deployment steps.
-```
+
