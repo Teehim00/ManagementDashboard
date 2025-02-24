@@ -1,26 +1,24 @@
-# Use Node.js as the base image
-FROM node:18
+# ใช้ Node.js image
+FROM node:18-alpine
 
-# Set the working directory inside the container
+# ตั้งค่า directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json files
+# คัดลอกไฟล์ package และติดตั้ง dependencies
 COPY package*.json ./
+RUN npm ci
 
-# Install dependencies
-RUN npm install
-
-# Copy the rest of the application code
+# คัดลอกโค้ดทั้งหมด
 COPY . .
 
-# Generate Database
-RUN npx prisma migrate dev --name init
+# # Generate Database
+# RUN npx prisma migrate dev --name init
 
-# Build the Next.js application
+# Build แอป Next.js
 RUN npm run build
 
-# Expose the port the app runs on
+# เปิดพอร์ต 3000 สำหรับ Next.js
 EXPOSE 3000
 
-# Start the Next.js application
+# รัน Next.js แอป
 CMD ["npm", "start"]
